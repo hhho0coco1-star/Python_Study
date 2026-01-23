@@ -1,24 +1,29 @@
-# chr(정수) : 정수 -> 문자
-# ord(문자) : 문자 -> 정수
+data = "%d" %100 # 문자열 타입(str)
+print(data)
+print(type(data))
 
-print(chr(ord('A') * 3)) # 65(아스키코드) * 3
+# format 함수
+data1 = 10
+print("data1 : {}".format(data1))
+print("{} : {}".format(data, data1))
 
-# 암호화
-pw = "a1b2c3"
-en_pw = ""
-de_pw = ""
+str01 = 'A'
+str02 = "ABC"
 
-for i in pw :
-    en_pw += chr(ord(i) * 9)
+print("%s" %str01)
+print("%c" %str01)
 
-print("{pw}".format(pw=en_pw))
+print("%s" %str02)
+# print("%c" %str02) type error
 
-# 복호화
-for i in en_pw :
-    de_pw += chr(ord(i) // 9)
+# 아스키코드
+print("data : %c" %65)
+print("data : %c" %97)
 
-print("{pw}".format(pw=de_pw))
+# 자동 형변환 / 강제 형변환
+# 정수 + 실수 = 실수 (자동)
 
-# 입력함수(input)
-name = input("이름 : ")
-print(name)
+# // 몫 연산자
+
+print(float(10)//3) # 강제 형변환
+
