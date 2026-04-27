@@ -17,7 +17,7 @@
 #       result.append(x * 2)
 #
 #   # 리스트 컴프리헨션
-#   result = [x * 2 for x in range(5)]
+#   result = [x * 2 for x in range(5)] -> [0, 2, 4, 6, 8]
 #
 # 언제 쓰나?
 #   - 기존 컬렉션을 변환(transform)하거나 필터링할 때
@@ -149,6 +149,8 @@ print(pairs)    # [(1, 10), (1, 20), (3, 10), (3, 20)]
 # 언제 유리한가?
 #   - 백만 개짜리 리스트를 만들 필요 없이 합계만 구할 때
 #   - 결과를 모두 저장하지 않고 순차적으로 처리할 때
+#   - 메모리 사용량이 중요하 경우(예: 대용량 데이터 처리) + 필요할 때마다 하나씩 계산해서 메모리 절약
+# 단점: 리스트처럼 인덱싱/슬라이싱 불가, 한 번 순회하면 소진됨
 
 # 리스트 컴프리헨션: 100만 개를 한꺼번에 메모리에 올림
 # list_result = [x**2 for x in range(1_000_000)]  # 많은 메모리 사용
@@ -167,6 +169,8 @@ print(type(gen))        # <class 'generator'>
 # 1~20 중 3의 배수인 숫자들의 제곱값 리스트를 만드세요.
 # 예: [9, 36, 81, 144, 225, 324]
 # 코드 작성 ↓
+problem1 = [x**2 for x in range(1, 21) if x % 3 == 0]
+print(problem1) # [9, 36, 81, 144, 225, 324]
 
 
 # [문제 2] 딕셔너리 컴프리헨션으로 아래를 작성하세요.
@@ -175,12 +179,14 @@ print(type(gen))        # <class 'generator'>
 # 등급 기준: 90 이상 → "A", 80 이상 → "B", 나머지 → "C"
 students = [("철수", 85), ("영희", 92), ("민준", 65), ("지아", 78), ("준호", 55)]
 # 코드 작성 ↓
+problem2 = {name: ("A" if score >= 90 else "B" if score >= 80 else "C") for name, score in students if score >= 70}
 
 
 # [문제 3] 아래 sentence에서 단어를 추출하고
 # 길이가 4글자 이상인 단어들만 소문자로 변환한 셋을 만드세요.
 sentence = "The quick brown fox jumps over the lazy dog"
 # 코드 작성 ↓
+problem3 = {word.lower() for word in sentence.split() if len(word) >= 4}
 
 
 # [문제 4] 아래 matrix(3x3 행렬)에서
@@ -188,3 +194,4 @@ sentence = "The quick brown fox jumps over the lazy dog"
 # 예: [2, 4, 6, 8]
 matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 # 코드 작성 ↓
+problem4 = [x for row in matrix for x in row if x % 2 == 0]
