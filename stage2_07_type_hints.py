@@ -45,6 +45,12 @@ print(is_adult(20))     # True
 # - 반환: float (넓이 = 3.14159 * radius ** 2)
 # - circle_area(5.0)의 결과를 출력하세요.
 # 코드 작성 ↓
+import math
+
+def circle_area(radius: float) -> float:
+    return math.pi * radius ** 2
+
+print(circle_area(5.0)) 
 
 
 # ============================================================
@@ -88,7 +94,12 @@ print(first_last(["사과", "바나나", "포도"])) # ('사과', '포도')
 # - 아래 데이터로 결과를 출력하세요.
 students = {"철수": 80, "영희": 92, "민준": 68, "지수": 75}
 # 코드 작성 ↓
+def average_score(scores: dict[str, int]) -> float:
+    total = sum(scores.values())
+    count = len(scores)
+    return total / count if count > 0 else 0.0
 
+print(average_score(students))
 
 # ============================================================
 # [이론 3] Optional / Union
@@ -133,7 +144,12 @@ print(stringify("abc")) # abc
 # - 반환: str
 # - make_greeting("영희")와 make_greeting(None) 모두 출력하세요.
 # 코드 작성 ↓
-
+def make_greeting(name: Optional[str]) -> str:
+    if name is None:
+        name = "손님"
+    return f"안녕하세요, {name}님!"
+print(make_greeting("영희"))
+print(make_greeting(None))
 
 # ============================================================
 # [이론 4] TypedDict — 딕셔너리 구조 타입 지정
@@ -146,6 +162,7 @@ print(stringify("abc")) # abc
 #       name: str
 #       price: int
 #       in_stock: bool
+
 
 from typing import TypedDict
 
@@ -177,6 +194,18 @@ print_product(grape)   # 포도 — 3,000원 (품절)
 #   {"name": "김철수", "department": "개발팀", "salary": 4500000}
 #   {"name": "이영희", "department": "디자인팀", "salary": 4000000}
 # 코드 작성 ↓
+class Employee(TypedDict):
+    name: str
+    department: str
+    salary: int
+
+def print_employee(e: Employee) -> None:
+    print(f"{e['name']} / {e['department']} / 월급: {e['salary']:,}원")
+
+employee1: Employee = {"name": "김철수", "department": "개발팀", "salary": 4500000}
+employee2: Employee = {"name": "이영희", "department": "디자인팀", "salary": 4000000}
+print_employee(employee1)
+print_employee(employee2)
 
 
 # ============================================================
@@ -220,7 +249,7 @@ s2 = Student("영희", 92)
 s3 = Student("민준", 78)
 students_list = [s1, s2, s3]
 for s in sorted(students_list, key=lambda s: s.score, reverse=True):
-    print(f"{s.name}: {s.score}점")
+    print(f"{s.name}: {s.score}점") # 영희: 92점, 철수: 85점, 민준: 78점
 
 
 # ============================================================
@@ -235,3 +264,20 @@ for s in sorted(students_list, key=lambda s: s.score, reverse=True):
 #   Book("알고리즘의 이해", "이영희", 22000)
 # - 출력 형식: "{title} / {author} / {price:,}원 / {'재고있음' if in_stock else '품절'}"
 # 코드 작성 ↓
+@dataclass
+class Book:
+    title: str
+    author: str
+    price: int
+    in_stock: bool = True
+
+book1 = Book("파이썬 완전정복", "홍길동", 28000)
+book2 = Book("데이터 분석 입문", "김철수", 35000, False)
+book3 = Book("알고리즘의 이해", "이영희", 22000)
+books = [book1, book2, book3]
+
+for book in sorted(books, key=lambda b: b.price):
+    stock_status = "재고있음" if book.in_stock else "품절"
+    print(f"{book.title} / {book.author} / {book.price:,}원 / {stock_status}")
+    
+
