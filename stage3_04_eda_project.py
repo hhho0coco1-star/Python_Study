@@ -185,16 +185,6 @@ axes[1].set_title('나이 분포')          # 오른쪽 제목
 plt.tight_layout()   # 서브플롯 간격 자동 조정
 plt.show()           # 그래프 출력
 
-flg, axes = plt.subplot(1, 2, figsize=(12, 4)) # 1행 2열 서브플롯 생성
-sns.boxplot(data=titanic, x='places', y='fare', ax=axes[0])
-axes[0].set_title('등급별 운임 분포') # 왼쪽 제목
-sns.histplot(titanic['age'], bins=20, kde=True, ax=axes[1])
-axes[1].set_title('나이 분포') # 오른쪽 제목
-plt.tight_layout() # 서브플롯 간격 자동 조정
-plt.show() # 그래프 출력
-
-
-
 
 # ============================================================
 # [이론 4] 범주형 변수 분포 & 생존율 비교
@@ -257,18 +247,6 @@ sns.barplot(data=titanic, x='embarked', y='survived', ax=axes[1])
 axes[1].set_title('탑승 항구별 생존율')    # 오른쪽 제목
 plt.tight_layout()   # 서브플롯 간격 자동 조정
 plt.show()           # 그래프 출력
-
-fig, axes = plt.subplot(1, 2, figsize=(12, 4)) # 1행 2열 서브플롯 생성
-sns.countplot(data=titanic, x='embarked', ax=axes[0])
-axes[0].set_title('탑승 항구별 승객 수')
-
-sns.barplot(data=titanic, x='embarked', y='survived', ax=axes[1])
-axes[1].set_title('탑승 항구별 생존율')
-
-plt.tight_layout()
-plt.show()
-
-
 
 
 # ============================================================
