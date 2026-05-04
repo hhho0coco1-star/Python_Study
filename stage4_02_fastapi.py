@@ -6,6 +6,9 @@
 #   - Pydantic으로 요청/응답 데이터를 자동 검증
 #   - /docs 접속 시 Swagger UI 자동 생성 (별도 설정 없음)
 #
+# 프레임워크 : 뼈대 or 틀 == 밀키트 
+# 개발하기 위해 필요한 기본 구조와 도구들이 갖춰진 일종의 '반제품 패키지'
+# 
 # [사전 설치]
 #   pip install fastapi uvicorn
 #
@@ -73,8 +76,14 @@ def health_check():
 # ============================================================
 # 1) GET /hello 요청 시 {"greeting": "안녕하세요, FastAPI!"} 를 반환하는
 #    라우트 함수 say_hello()를 작성하세요.
+@app.get("/hello")
+def say_hello():
+    return {"greeting" : "안녕하세요, FastAPI!"}
 # 2) GET /info 요청 시 서버 이름("FastAPI 학습 서버")과
 #    버전("1.0.0")을 담은 딕셔너리를 반환하세요.
+@app.get("/info")
+def get_info():
+    return {"name" : "FastAPI 학습 서버", "version" : "1.0.0"}
 # 코드 작성 ↓
 
 # [정답 코드]
@@ -138,10 +147,19 @@ def get_user_post(user_id: int, post_id: int):
 # 1) GET /products/{product_id} 라우트를 만드세요.
 #    - product_id가 fake_items_db에 없으면 404 + "상품 없음" 메시지
 #    - 있으면 해당 아이템 반환
+@app.get("/products/{product_id}")
+def get_product(product_id : int):
+    if product_id not in fake_items_db:
+        raise HTTPException(status_code=404, detail="상품 없음")
+    return fake_items_db[product_id]
 # 2) GET /categories/{category}/items/{item_id} 라우트를 만드세요.
 #    - category(str)와 item_id(int)를 경로 매개변수로 받아
 #    - {"category": ..., "item_id": ...} 형태로 반환
+@app.get("/categories/{category}/items/{item_id}")
+def get_category_item(category : str, item_id : int):
+    return {"category" : category, "item_id" : item_id}
 # 코드 작성 ↓
+
 
 # [정답 코드]
 @app.get("/products/{product_id}")
@@ -210,6 +228,19 @@ def list_items(
 #   - fake_items_db에서 조건에 맞는 아이템 리스트를 반환
 #   - 예) /search?q=키&max_price=100000 → 이름에 "키"가 포함되고 가격 ≤ 100000
 # 코드 작성 ↓
+
+@app.get("/search")
+def search_items(
+    q : str = Query(description="검색어(필수)"),
+    max_price : Optional[int] = Query(default=None, ge=0, description="최대 가격")
+    # Optional : 선택(있어도 되고, 없어도 된다.) /= Required : 필수
+):
+    results = [item for item in fake_items_db.values() if q in item["name"]]
+
+    if max_price is not None:
+        results = [item for item in results if item["price"] <= max_price]
+
+    return {"query" : q, "max_price" : max_price, "results" : results}
 
 # [정답 코드]
 @app.get("/search")
@@ -315,36 +346,36 @@ def delete_item(item_id: int):
 # 데이터 저장소:
 #   fake_memo_db = {}  (딕셔너리, 전역 변수)
 #
+fake_memo_db = {}
+memo_counter = 1  # ID 카운터 (전역 변수)
 # 1) MemoCreate 모델 정의
 #    - title: str (필수, 최소 1글자)
 #    - content: str (필수, 최소 1글자)
+class MemoCreate(BaseModel):
+    title: str = Field(min_length=1, description="메모 제목")
+    content: str = Field(min_length=1, description="메모 내용")
+
+class MemoCreate2(BaseModel):
+    title : str = Field(min_length=1, description="메모 제목")
+    content : str = Field(min_length=1, description="메모 내용")
 #
 # 2) MemoResponse 모델 정의
 #    - id: int
 #    - title: str
 #    - content: str
-#
-# 3) POST /memos 라우트
-#    - MemoCreate로 요청 받아 fake_memo_db에 저장
-#    - MemoResponse로 응답, 상태 코드 201
-#
-# 4) GET /memos/{memo_id} 라우트
-#    - 없으면 404, 있으면 MemoResponse로 반환
-# 코드 작성 ↓
-
-# [정답 코드]
-fake_memo_db = {}
-memo_counter = 1  # ID 카운터 (전역 변수)
-
-class MemoCreate(BaseModel):
-    title: str = Field(min_length=1, description="메모 제목")
-    content: str = Field(min_length=1, description="메모 내용")
-
 class MemoResponse(BaseModel):
     id: int
     title: str
     content: str
 
+class MemoResponse(BaseModel):
+    id : int
+    title : str
+    content : str
+#
+# 3) POST /memos 라우트
+#    - MemoCreate로 요청 받아 fake_memo_db에 저장
+#    - MemoResponse로 응답, 상태 코드 201
 @app.post("/memos", response_model=MemoResponse, status_code=201)
 def create_memo(memo: MemoCreate):
     global memo_counter
@@ -354,11 +385,31 @@ def create_memo(memo: MemoCreate):
     memo_counter += 1
     return new_memo
 
+@app.post("/memos", response_model=MemoResponse, status_code=201)
+def create_memo(memo : MemoCreate):
+    global memo_counter
+    new_memo = {"id" : memo_counter, "title" : memo.title, "content" : memo.content}
+    fake_memo_db[memo_counter] = new_memo
+    memo_counter += 1
+    return new_memo
+#
+# 4) GET /memos/{memo_id} 라우트
+#    - 없으면 404, 있으면 MemoResponse로 반환
+# 코드 작성 ↓
 @app.get("/memos/{memo_id}", response_model=MemoResponse)
 def get_memo(memo_id: int):
     if memo_id not in fake_memo_db:
         raise HTTPException(status_code=404, detail="메모를 찾을 수 없습니다.")
     return fake_memo_db[memo_id]
+
+
+@app.get("/memos/{memo_id}", response_model=MemoResponse)
+def get_memo(memo_id : int):
+    if memo_id not in fake_memo_db:
+        raise HTTPException(status_code=404, detail="메모를 찾을 수 없습니다.")
+    return fake_memo_db[memo_id]
+
+# [정답 코드]
 
 
 # ============================================================
@@ -424,22 +475,34 @@ def list_secure_items(
 # 1) 공통 의존성 함수 check_positive_id(item_id: int) 를 만드세요.
 #    - item_id가 1 미만이면 HTTPException(400, "ID는 1 이상이어야 합니다.")
 #    - 아니면 item_id 반환
-#
-# 2) GET /v2/items/{item_id} 라우트를 Depends(check_positive_id) 를 사용해 만드세요.
-#    - 검증 통과 후 fake_items_db에서 조회, 없으면 404
-# 코드 작성 ↓
-
-# [정답 코드]
 def check_positive_id(item_id: int = Path(description="아이템 ID")):
     if item_id < 1:
         raise HTTPException(status_code=400, detail="ID는 1 이상이어야 합니다.")
     return item_id
 
+def check_positive_id(item_id : int = Path(description="아이템 ID")):
+    if item_id < 1:
+        raise HTTPException(status_code=400, detail="ID는 1 이상이어야 합니다.")
+    return item_id
+#
+# 2) GET /v2/items/{item_id} 라우트를 Depends(check_positive_id) 를 사용해 만드세요.
+#    - 검증 통과 후 fake_items_db에서 조회, 없으면 404
+# 코드 작성 ↓
 @app.get("/v2/items/{item_id}", response_model=ItemResponse)
 def get_item_v2(item_id: int = Depends(check_positive_id)):
     if item_id not in fake_items_db:
         raise HTTPException(status_code=404, detail="아이템을 찾을 수 없습니다.")
     return fake_items_db[item_id]
+
+@app.get("/v2/items/{item_id}", response_model=ItemResponse)
+def get_item_v2(item_id : int = Depends(check_positive_id)):
+    if item_id not in fake_items_db:
+        raise HTTPException(status_code=404, detail="아이템을 찾을 수 없습니다.")
+    return fake_items_db[item_id]
+
+
+
+
 
 
 # ============================================================
