@@ -13,8 +13,8 @@
 | Stage 1 | 파이썬 기초 | ✅ 완료 (7/7) |
 | Stage 2 | 중급 파이썬 | ✅ 완료 (7/7) |
 | Stage 3 | 데이터 분석 트랙 | ✅ 완료 (5/5) |
-| Stage 4 | 백엔드 웹 개발 트랙 | 🔄 진행 중 (2/5) |
-| Stage 5 | 심화 & 고급 | ⏳ 예정 |
+| Stage 4 | 백엔드 웹 개발 트랙 | ✅ 완료 (5/5) |
+| Stage 5 | 심화 & 고급 | ✅ 완료 (5/5) |
 
 ---
 
@@ -307,7 +307,7 @@
 
 ---
 
-### 03. 데이터베이스 🔄
+### 03. 데이터베이스 ✅
 **파일:** `stage4_03_database.py`
 
 | 개념 | 내용 |
@@ -320,77 +320,106 @@
 
 ---
 
-### 04. JWT 인증 ⏳
-**파일:** `stage4_04_auth.py` (예정)
+### 04. JWT 인증 ✅
+**파일:** `stage4_04_auth.py`
 
 | 개념 | 내용 |
 |------|------|
 | JWT 구조 | Header.Payload.Signature |
+| 비밀번호 해싱 | `passlib[bcrypt]`, `CryptContext` |
 | 토큰 발급 | 로그인 성공 시 access token 반환 |
-| 토큰 검증 | 요청 헤더 `Authorization: Bearer` |
-| `python-jose` | JWT 라이브러리 |
+| 토큰 검증 | `OAuth2PasswordBearer`, `jwt.decode()` |
+| 보호된 엔드포인트 | `Depends(get_current_user)` |
 
 ---
 
-### 05. CRUD API 프로젝트 ⏳
-**파일:** `stage4_05_project/` (예정)
+### 05. CRUD API 프로젝트 ✅
+**파일:** `stage4_05_project.py`
 
-회원가입/로그인 + 게시글 CRUD 기능을 갖춘 REST API 서버 완성
+| 개념 | 내용 |
+|------|------|
+| 전체 통합 | FastAPI + SQLAlchemy + JWT 한 파일에 통합 |
+| DB 관계 설계 | User(1) — Post(N), ForeignKey, relationship |
+| 스키마 분리 | PostCreate / PostUpdate / PostResponse |
+| 권한 제어 | 본인 글만 수정/삭제 (403 Forbidden) |
+| 상태 코드 | 201 Created, 204 No Content, 403 Forbidden |
 
 ---
 
 ## Stage 5 — 심화 & 고급
 
-### 01. 비동기 프로그래밍 ⏳
-**파일:** `stage5_01_async.py` (예정)
+### 01. 비동기 프로그래밍 ✅
+**파일:** `stage5_01_async.py`
 
 | 개념 | 내용 |
 |------|------|
 | `asyncio` | 이벤트 루프 기반 비동기 |
-| `async def` | 비동기 함수 선언 |
-| `await` | 비동기 작업 대기 |
-| `aiohttp` | 비동기 HTTP 클라이언트 |
+| `async def` / `await` | 코루틴 선언 및 대기 |
+| `asyncio.gather` | 여러 코루틴 동시 실행 |
+| `asyncio.create_task` | 백그라운드 태스크 등록 |
+| `asyncio.wait_for` | 타임아웃 처리 |
+| `aiohttp` | 비동기 HTTP 클라이언트 (pip install aiohttp) |
+| FastAPI async 라우트 | `async def` 핸들러로 논블로킹 처리 |
 
 ---
 
-### 02. 테스팅 ⏳
-**파일:** `stage5_02_testing.py` (예정)
+### 02. 테스팅 ✅
+**파일:** `stage5_02_testing.py`
 
 | 개념 | 내용 |
 |------|------|
-| pytest | 테스트 프레임워크 |
-| 단위 테스트 | 함수/메서드 단위 검증 |
-| 픽스처 | `@pytest.fixture` |
-| 모킹 | `unittest.mock`, `pytest-mock` |
+| pytest | `test_` 함수 자동 탐지 및 실행 |
+| `pytest.raises` | 예외 발생 테스트 |
+| `@pytest.fixture` | 공통 설정/해제 (setup/teardown) |
+| `@pytest.mark.parametrize` | 다중 입력값 반복 테스트 |
+| `unittest.mock.Mock` | 외부 의존성 가짜 객체 |
+| `patch()` | 특정 모듈/함수 모킹 |
+| `side_effect` | 예외 발생 또는 동적 반환값 설정 |
+
+**실행:** `pytest stage5_02_testing.py -v`
 
 ---
 
-### 03. 성능 최적화 ⏳
-**파일:** `stage5_03_performance.py` (예정)
+### 03. 성능 최적화 ✅
+**파일:** `stage5_03_performance.py`
 
 | 개념 | 내용 |
 |------|------|
-| 프로파일링 | `cProfile`, `timeit` |
-| 캐싱 | `functools.lru_cache` |
-| 제너레이터 활용 | 메모리 효율화 |
+| `timeit` | 코드 조각 실행 시간 측정 |
+| `cProfile` + `pstats` | 함수 단위 프로파일링 |
+| `functools.lru_cache` | 메모이제이션 (순수 함수 캐싱) |
+| 제너레이터 | 리스트 대비 메모리 절약 (lazy evaluation) |
+| 컴프리헨션 | for 루프 대비 C 최적화로 빠름 |
+| `dict`/`set` 탐색 | 리스트 O(n) vs 해시 O(1) |
+| `__slots__` | 수백만 객체 생성 시 메모리 절약 |
 
 ---
 
-### 04. 디자인 패턴 ⏳
-**파일:** `stage5_04_patterns.py` (예정)
+### 04. 디자인 패턴 ✅
+**파일:** `stage5_04_patterns.py`
 
-싱글톤, 팩토리, 옵저버, 전략 패턴 등 파이썬에서의 구현
+| 패턴 | 분류 | 목적 |
+|------|------|------|
+| 싱글톤(Singleton) | 생성 | 인스턴스 하나만 유지 (DB 연결, 설정) |
+| 팩토리(Factory) | 생성 | 객체 생성 로직 캡슐화 (알림 타입 선택) |
+| 옵저버(Observer) | 행동 | 이벤트 발생 시 N개 구독자 자동 통보 |
+| 전략(Strategy) | 행동 | 알고리즘을 런타임에 교체 (할인 정책) |
+| 데코레이터(Decorator) | 구조 | 기존 코드 수정 없이 기능 추가 (타이머, 재시도) |
 
 ---
 
-### 05. Docker 기초 ⏳
-**파일:** `stage5_05_docker.md` (예정)
+### 05. Docker 기초 ✅
+**파일:** `stage5_05_docker.md`
 
 | 개념 | 내용 |
 |------|------|
-| Dockerfile | 파이썬 앱 이미지 빌드 |
-| docker-compose | 멀티 컨테이너 구성 |
-| 환경변수 | `.env` 파일 활용 |
+| 이미지 / 컨테이너 | 설계도 vs 실행 인스턴스 |
+| Dockerfile | `FROM`, `WORKDIR`, `COPY`, `RUN`, `CMD` |
+| 레이어 캐시 | requirements.txt를 소스보다 먼저 COPY |
+| `.env` + `python-dotenv` | 민감 정보 환경변수 분리 |
+| `docker-compose.yml` | 앱+DB+Redis 멀티 컨테이너 구성 |
+| `.dockerignore` | 이미지 크기 최소화 |
+| 멀티스테이지 빌드 | 개발 의존성 제외한 경량 프로덕션 이미지 |
 
 ---
 
